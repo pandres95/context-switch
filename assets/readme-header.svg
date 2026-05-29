@@ -1,134 +1,449 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 400" width="1280" height="400">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 400" width="1280" height="400" role="img">
+  <title>Context Switch — git stash for your brain</title>
+
   <defs>
-    <!-- Background -->
-    <radialGradient id="bg" cx="35%" cy="50%" r="70%"
-                    gradientUnits="userSpaceOnUse" fx="450" fy="200">
-      <stop offset="0%" stop-color="#1E1048"/>
-      <stop offset="100%" stop-color="#06080F"/>
+
+    <!-- ─── Filters ─────────────────────────────────────────── -->
+
+    <filter id="f-card-dim" x="-18%" y="-18%" width="136%" height="136%">
+      <feGaussianBlur stdDeviation="3" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <filter id="f-card-active" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="10" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <filter id="f-window-blur">
+      <feGaussianBlur stdDeviation="0.5"/>
+    </filter>
+
+    <filter id="f-note-shadow" x="-30%" y="-30%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="9" result="blur"/>
+      <feOffset dx="5" dy="7" result="shifted"/>
+      <feFlood flood-color="#000" flood-opacity="0.45" result="color"/>
+      <feComposite in="color" in2="shifted" operator="in" result="shadow"/>
+      <feMerge><feMergeNode in="shadow"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <filter id="f-note-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="11" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+
+    <!-- ─── Gradients — background ───────────────────────────── -->
+
+    <radialGradient id="grad-bg" cx="35%" cy="50%" r="72%">
+      <stop offset="0%"   stop-color="#0e0c1c"/>
+      <stop offset="100%" stop-color="#060509"/>
     </radialGradient>
 
-    <!-- Origin cards — 3 violet shades -->
-    <linearGradient id="gV1" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#5B21B6"/>
-      <stop offset="100%" stop-color="#3B0764"/>
-    </linearGradient>
-    <linearGradient id="gV2" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#7C3AED"/>
-      <stop offset="100%" stop-color="#4C1D95"/>
-    </linearGradient>
-    <linearGradient id="gV3" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#A78BFA"/>
-      <stop offset="100%" stop-color="#7C3AED"/>
+
+    <!-- ─── Gradients — wallpapers ───────────────────────────── -->
+
+    <linearGradient id="grad-wp-personal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#2d1b69"/>
+      <stop offset="100%" stop-color="#1a0d3d"/>
     </linearGradient>
 
-    <!-- Destination — cyan -->
-    <linearGradient id="gC" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#38BDF8"/>
-      <stop offset="100%" stop-color="#0284C7"/>
+    <linearGradient id="grad-wp-uni" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#0e2254"/>
+      <stop offset="100%" stop-color="#081530"/>
     </linearGradient>
 
-    <!-- Destination glow -->
-    <filter id="fCardGlow" x="-24%" y="-18%" width="148%" height="136%">
-      <feDropShadow dx="0" dy="0" stdDeviation="18"
-                    flood-color="#38BDF8" flood-opacity="0.50"/>
-    </filter>
-
-    <!-- Note glow -->
-    <filter id="fNoteGlow" x="-90%" y="-80%" width="280%" height="260%">
-      <feDropShadow dx="0" dy="2" stdDeviation="20"
-                    flood-color="#F59E0B" flood-opacity="0.80"/>
-    </filter>
-
-    <!-- Subtle divider line -->
-    <linearGradient id="gDivider" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%"   stop-color="#7C3AED" stop-opacity="0"/>
-      <stop offset="40%"  stop-color="#7C3AED" stop-opacity="0.35"/>
-      <stop offset="60%"  stop-color="#06B6D4" stop-opacity="0.35"/>
-      <stop offset="100%" stop-color="#06B6D4" stop-opacity="0"/>
+    <linearGradient id="grad-wp-work" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#052330"/>
+      <stop offset="50%"  stop-color="#093845"/>
+      <stop offset="100%" stop-color="#031418"/>
     </linearGradient>
+
+
+    <!-- ─── Gradients — ambient blobs ────────────────────────── -->
+
+    <radialGradient id="grad-blob-personal" cx="60%" cy="65%" r="55%">
+      <stop offset="0%"   stop-color="#7c3aed" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#2d1b69" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="grad-blob-uni" cx="35%" cy="60%" r="55%">
+      <stop offset="0%"   stop-color="#2563eb" stop-opacity="0.50"/>
+      <stop offset="100%" stop-color="#0e2254" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="grad-blob-work" cx="50%" cy="52%" r="62%">
+      <stop offset="0%"   stop-color="#0891b2" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#052330" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="grad-halo-work" cx="50%" cy="50%" r="58%">
+      <stop offset="0%"   stop-color="#22d3ee" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#22d3ee" stop-opacity="0"/>
+    </radialGradient>
+
+
+    <!-- ─── Gradients — sticky note ─────────────────────────── -->
+
+    <linearGradient id="grad-note-face" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#fef3c7"/>
+      <stop offset="100%" stop-color="#fbbf24"/>
+    </linearGradient>
+
+
+    <!-- ─── Vignette ─────────────────────────────────────────── -->
+
+    <radialGradient id="grad-vignette" cx="30%" cy="50%" r="72%">
+      <stop offset="55%"  stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0.70"/>
+    </radialGradient>
+
+    <!-- ─── Divider ───────────────────────────────────────────── -->
+
+    <linearGradient id="grad-divider" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#7c3aed" stop-opacity="0"/>
+      <stop offset="35%"  stop-color="#7c3aed" stop-opacity="0.40"/>
+      <stop offset="65%"  stop-color="#22d3ee" stop-opacity="0.40"/>
+      <stop offset="100%" stop-color="#22d3ee" stop-opacity="0"/>
+    </linearGradient>
+
+
+    <!-- ─── Card clip paths ──────────────────────────────────── -->
+
+    <clipPath id="clip-card-personal-h">
+      <rect x="34"  y="42"  width="210" height="140" rx="11"/>
+    </clipPath>
+
+    <clipPath id="clip-card-uni-h">
+      <rect x="120" y="215" width="215" height="143" rx="12"/>
+    </clipPath>
+
+    <clipPath id="clip-card-work-h">
+      <rect x="365" y="30"  width="254" height="184" rx="16"/>
+    </clipPath>
+
+
+    <!-- ─── Symbols (same as icon) ───────────────────────────── -->
+
+    <symbol id="sym-menubar-h" viewBox="0 0 1 11" preserveAspectRatio="none">
+      <rect width="1" height="11" fill="#000" fill-opacity="0.30"/>
+      <circle cx="0.07" cy="5.5" r="0.018" fill="white" fill-opacity="0.5"/>
+      <rect x="0.13" y="3" width="0.10" height="4" rx="0.008" fill="white" fill-opacity="0.25"/>
+      <rect x="0.25" y="3" width="0.07" height="4" rx="0.008" fill="white" fill-opacity="0.20"/>
+      <rect x="0.34" y="3" width="0.08" height="4" rx="0.008" fill="white" fill-opacity="0.18"/>
+      <rect x="0.94" y="3" width="0.04" height="4" rx="0.005" fill="white" fill-opacity="0.32"/>
+      <rect x="0.88" y="3" width="0.04" height="4" rx="0.005" fill="white" fill-opacity="0.32"/>
+      <rect x="0.82" y="3" width="0.04" height="4" rx="0.005" fill="white" fill-opacity="0.28"/>
+    </symbol>
+
+    <symbol id="sym-traffic-lights-h" viewBox="0 0 20 4">
+      <circle cx="2"  cy="2" r="1.8" fill="#ff5f57"/>
+      <circle cx="8"  cy="2" r="1.8" fill="#febc2e"/>
+      <circle cx="14" cy="2" r="1.8" fill="#28c840"/>
+    </symbol>
+
+    <symbol id="sym-dock-pill-h" viewBox="0 0 100 10">
+      <rect width="100" height="10" rx="5" fill="white" fill-opacity="0.10"/>
+    </symbol>
+
   </defs>
 
+
   <!-- Background -->
-  <rect width="1280" height="400" fill="url(#bg)"/>
+  <rect width="1280" height="400" fill="url(#grad-bg)"/>
 
-  <!-- ════════════════════════════════════════════
-       ORIGIN GROUP  — 3 cards (contexts)
-       Cards: 148×256, stacked diagonally
-       ════════════════════════════════════════════ -->
+  <!-- Ambient depth blobs -->
+  <ellipse cx="200" cy="300" rx="220" ry="175" fill="#1a0840" opacity="0.18"/>
+  <ellipse cx="500" cy="200" rx="200" ry="160" fill="#031e28" opacity="0.18"/>
 
-  <!-- Card 1 — Personal (back) -->
-  <rect x="56" y="72" width="148" height="256" rx="16"
-        fill="url(#gV1)" opacity="0.36"/>
 
-  <!-- Card 2 — Universidad (mid) -->
-  <rect x="96" y="82" width="148" height="256" rx="16"
-        fill="url(#gV2)" opacity="0.58"/>
-  <!-- Lines -->
-  <rect x="116" y="144" width="98" height="8" rx="4" fill="white" opacity="0.16"/>
-  <rect x="116" y="160" width="70" height="8" rx="4" fill="white" opacity="0.12"/>
+  <!-- ═══════════════════════════════════════════════════════════
+       CARD 1 — Personal  (back, top-left)
+       x=34, y=42   210 × 140
+       ═══════════════════════════════════════════════════════════ -->
 
-  <!-- Card 3 — Bloque (front, current) -->
-  <rect x="136" y="92" width="148" height="256" rx="16"
-        fill="url(#gV3)" opacity="0.78"/>
-  <!-- Lines -->
-  <rect x="156" y="154" width="100" height="9" rx="4.5" fill="white" opacity="0.26"/>
-  <rect x="156" y="171" width="72"  height="9" rx="4.5" fill="white" opacity="0.18"/>
-  <rect x="156" y="188" width="86"  height="9" rx="4.5" fill="white" opacity="0.18"/>
-  <rect x="156" y="212" width="52"  height="9" rx="4.5" fill="white" opacity="0.12"/>
+  <g filter="url(#f-card-dim)" opacity="0.68">
+    <rect x="37" y="47"   width="210" height="140" rx="11" fill="#000" fill-opacity="0.38"/>
+    <rect x="34" y="42"   width="210" height="140" rx="11" fill="url(#grad-wp-personal)"/>
+    <rect x="34" y="42"   width="210" height="140" rx="11"
+          fill="url(#grad-blob-personal)" clip-path="url(#clip-card-personal-h)"/>
+    <use href="#sym-menubar-h" transform="translate(34,42) scale(210,1)"/>
 
-  <!-- ════════════════════════════════════════════
-       GAP — floating note
-       Gap: 284 → 428. Center x=356, y=200
-       ════════════════════════════════════════════ -->
+    <g clip-path="url(#clip-card-personal-h)" filter="url(#f-window-blur)">
+      <!-- Window: messaging -->
+      <g transform="translate(42,58)">
+        <rect width="90" height="68" rx="6" fill="#180a38" fill-opacity="0.9"/>
+        <rect width="90" height="11" rx="6" fill="#2d1b69" fill-opacity="0.95"/>
+        <rect y="5"  width="90" height="6" fill="#2d1b69" fill-opacity="0.95"/>
+        <use href="#sym-traffic-lights-h" transform="translate(6,3) scale(0.85)"/>
+        <rect x="6"  y="16" width="46" height="6" rx="2" fill="#7c3aed" fill-opacity="0.65"/>
+        <rect x="24" y="26" width="34" height="6" rx="2" fill="#4a1a6b" fill-opacity="0.72"/>
+        <rect x="6"  y="36" width="42" height="6" rx="2" fill="#7c3aed" fill-opacity="0.55"/>
+        <rect x="6"  y="46" width="52" height="6" rx="2" fill="#4a1a6b" fill-opacity="0.62"/>
+      </g>
+      <!-- Window: photo grid -->
+      <g transform="translate(142,55)">
+        <rect width="90" height="64" rx="6" fill="#1c0e3e" fill-opacity="0.92"/>
+        <rect width="90" height="11" rx="6" fill="#3b1f7a" fill-opacity="0.95"/>
+        <rect y="5" width="90" height="6" fill="#3b1f7a" fill-opacity="0.95"/>
+        <use href="#sym-traffic-lights-h" transform="translate(6,3) scale(0.85)"/>
+        <rect x="5"  y="16" width="33" height="21" rx="2" fill="#6d28d9" fill-opacity="0.48"/>
+        <rect x="42" y="16" width="33" height="21" rx="2" fill="#8b5cf6" fill-opacity="0.40"/>
+        <rect x="5"  y="41" width="33" height="20" rx="2" fill="#9333ea" fill-opacity="0.36"/>
+        <rect x="42" y="41" width="33" height="20" rx="2" fill="#7c3aed" fill-opacity="0.42"/>
+      </g>
+    </g>
 
-  <g transform="rotate(8, 356, 200)" filter="url(#fNoteGlow)">
-    <rect x="325" y="156" width="62" height="88" rx="8" fill="#FBBF24"/>
-    <!-- Lines -->
-    <rect x="337" y="176" width="38" height="6" rx="3" fill="#78350F" opacity="0.65"/>
-    <rect x="337" y="190" width="26" height="6" rx="3" fill="#78350F" opacity="0.55"/>
-    <rect x="337" y="204" width="32" height="6" rx="3" fill="#78350F" opacity="0.55"/>
-    <rect x="337" y="218" width="20" height="6" rx="3" fill="#78350F" opacity="0.42"/>
+    <!-- Dock -->
+    <g transform="translate(34,42)" clip-path="url(#clip-card-personal-h)">
+      <use href="#sym-dock-pill-h" transform="translate(40,129) scale(1.30,1)"/>
+      <rect x="46"  y="131" width="9" height="5" rx="2" fill="#a855f7" fill-opacity="0.70"/>
+      <rect x="58"  y="131" width="9" height="5" rx="2" fill="#ec4899" fill-opacity="0.60"/>
+      <rect x="70"  y="131" width="9" height="5" rx="2" fill="#8b5cf6" fill-opacity="0.60"/>
+      <rect x="82"  y="131" width="9" height="5" rx="2" fill="#f472b6" fill-opacity="0.50"/>
+      <circle cx="50" cy="138" r="1.2" fill="white" fill-opacity="0.38"/>
+    </g>
+
+    <rect x="34" y="42" width="210" height="24" rx="11"
+          fill="white" fill-opacity="0.04" clip-path="url(#clip-card-personal-h)"/>
+    <rect x="34" y="42" width="210" height="140" rx="11"
+          fill="none" stroke="#9d5cf6" stroke-width="0.7" stroke-opacity="0.42"/>
   </g>
 
-  <!-- ════════════════════════════════════════════
-       DESTINATION CARD  — single, dominant
-       x=428, y=44, 192×312
-       ════════════════════════════════════════════ -->
 
-  <g filter="url(#fCardGlow)">
-    <rect x="428" y="44" width="192" height="312" rx="16" fill="url(#gC)"/>
+  <!-- ═══════════════════════════════════════════════════════════
+       CARD 2 — Universidad  (front origin, mid)
+       x=120, y=215   215 × 143
+       ═══════════════════════════════════════════════════════════ -->
+
+  <g filter="url(#f-card-dim)" opacity="0.90">
+    <rect x="123" y="220" width="215" height="143" rx="12" fill="#000" fill-opacity="0.42"/>
+    <rect x="120" y="215" width="215" height="143" rx="12" fill="url(#grad-wp-uni)"/>
+    <rect x="120" y="215" width="215" height="143" rx="12"
+          fill="url(#grad-blob-uni)" clip-path="url(#clip-card-uni-h)"/>
+    <use href="#sym-menubar-h" transform="translate(120,215) scale(215,1)"/>
+
+    <g clip-path="url(#clip-card-uni-h)" filter="url(#f-window-blur)">
+      <!-- Window: PDF reader -->
+      <g transform="translate(128,230)">
+        <rect width="110" height="82" rx="6" fill="#0b1c3c" fill-opacity="0.92"/>
+        <rect width="110" height="12" rx="6" fill="#18357a" fill-opacity="0.95"/>
+        <rect y="6" width="110" height="6" fill="#18357a" fill-opacity="0.95"/>
+        <use href="#sym-traffic-lights-h" transform="translate(7,3.5) scale(0.9)"/>
+        <rect x="8" y="18" width="92" height="3.5" rx="1" fill="#4a7cc7" fill-opacity="0.55"/>
+        <rect x="8" y="24" width="84" height="3.5" rx="1" fill="#4a7cc7" fill-opacity="0.42"/>
+        <rect x="8" y="30" width="92" height="3.5" rx="1" fill="#4a7cc7" fill-opacity="0.48"/>
+        <rect x="8" y="36" width="64" height="3.5" rx="1" fill="#4a7cc7" fill-opacity="0.36"/>
+        <rect x="8" y="42" width="88" height="3.5" rx="1" fill="#4a7cc7" fill-opacity="0.42"/>
+        <rect x="8" y="48" width="74" height="3.5" rx="1" fill="#4a7cc7" fill-opacity="0.36"/>
+        <rect x="8" y="54" width="94" height="3.5" rx="1" fill="#4a7cc7" fill-opacity="0.32"/>
+        <rect x="8" y="60" width="70" height="3.5" rx="1" fill="#4a7cc7" fill-opacity="0.30"/>
+      </g>
+      <!-- Window: browser -->
+      <g transform="translate(252,228)">
+        <rect width="76" height="76" rx="6" fill="#0c1d42" fill-opacity="0.92"/>
+        <rect width="76" height="12" rx="6" fill="#1f3d82" fill-opacity="0.95"/>
+        <rect y="6" width="76" height="6" fill="#1f3d82" fill-opacity="0.95"/>
+        <use href="#sym-traffic-lights-h" transform="translate(6,3.5) scale(0.85)"/>
+        <rect x="5" y="17" width="64" height="5"  rx="2" fill="#1a3a72" fill-opacity="0.70"/>
+        <rect x="5" y="26" width="64" height="11" rx="2" fill="#2d5a9e" fill-opacity="0.40"/>
+        <rect x="5" y="40" width="44" height="3.5" rx="1" fill="#3b5fc0" fill-opacity="0.45"/>
+        <rect x="5" y="47" width="62" height="3.5" rx="1" fill="#3b5fc0" fill-opacity="0.32"/>
+        <rect x="5" y="54" width="36" height="9"  rx="2" fill="#2563eb" fill-opacity="0.46"/>
+      </g>
+    </g>
+
+    <!-- Dock -->
+    <g transform="translate(120,215)" clip-path="url(#clip-card-uni-h)">
+      <use href="#sym-dock-pill-h" transform="translate(52,132) scale(1.30,1)"/>
+      <rect x="57"  y="134" width="9" height="5" rx="2" fill="#3b82f6" fill-opacity="0.70"/>
+      <rect x="69"  y="134" width="9" height="5" rx="2" fill="#60a5fa" fill-opacity="0.60"/>
+      <rect x="81"  y="134" width="9" height="5" rx="2" fill="#2563eb" fill-opacity="0.60"/>
+      <rect x="93"  y="134" width="9" height="5" rx="2" fill="#4f46e5" fill-opacity="0.58"/>
+      <circle cx="61" cy="141" r="1.3" fill="white" fill-opacity="0.38"/>
+      <circle cx="73" cy="141" r="1.3" fill="white" fill-opacity="0.38"/>
+    </g>
+
+    <rect x="120" y="215" width="215" height="27" rx="12"
+          fill="white" fill-opacity="0.045" clip-path="url(#clip-card-uni-h)"/>
+    <rect x="120" y="215" width="215" height="143" rx="12"
+          fill="none" stroke="#5080cc" stroke-width="0.8" stroke-opacity="0.48"/>
   </g>
-  <!-- Lines -->
-  <rect x="452" y="114" width="128" height="10" rx="5" fill="white" opacity="0.45"/>
-  <rect x="452" y="133" width="92"  height="10" rx="5" fill="white" opacity="0.32"/>
-  <rect x="452" y="152" width="112" height="10" rx="5" fill="white" opacity="0.32"/>
-  <rect x="452" y="179" width="72"  height="10" rx="5" fill="white" opacity="0.22"/>
-  <rect x="452" y="196" width="100" height="10" rx="5" fill="white" opacity="0.22"/>
 
-  <!-- ════════════════════════════════════════════
-       DIVIDER + TEXT
-       ════════════════════════════════════════════ -->
 
-  <rect x="672" y="0" width="1" height="400" fill="url(#gDivider)"/>
+  <!-- ═══════════════════════════════════════════════════════════
+       STICKY NOTE — landing on card-uni, front-right edge
+       Pre-rotation rect: x=226, y=268, w=72, h=68
+       Pivot (bottom-right landing corner): (298, 336)
+       Rotation: -9°
+       ═══════════════════════════════════════════════════════════ -->
 
-  <!-- Extension name -->
-  <text x="712" y="186"
+  <g id="sticky-note-h">
+    <!-- Ambient glow -->
+    <rect x="222" y="264" width="80" height="76" rx="5"
+          fill="#fbbf24" fill-opacity="0.38"
+          filter="url(#f-note-glow)"
+          transform="rotate(-9, 298, 336)"/>
+    <!-- Ground shadow -->
+    <ellipse cx="278" cy="340" rx="34" ry="7"
+             fill="#000" fill-opacity="0.32"
+             filter="url(#f-note-shadow)"/>
+    <!-- Note body -->
+    <g filter="url(#f-note-shadow)" transform="rotate(-9, 298, 336)">
+      <rect x="226" y="268" width="72" height="68" rx="4" fill="url(#grad-note-face)"/>
+      <!-- Adhesive strip -->
+      <rect x="226" y="268" width="72" height="10" rx="4" fill="#fbbf24" fill-opacity="0.55"/>
+      <rect x="226" y="273" width="72" height="5"  fill="#fbbf24" fill-opacity="0.38"/>
+      <!-- Ruled lines -->
+      <line x1="236" y1="287" x2="290" y2="287" stroke="#92400e" stroke-width="1" stroke-opacity="0.38"/>
+      <line x1="236" y1="296" x2="290" y2="296" stroke="#92400e" stroke-width="1" stroke-opacity="0.32"/>
+      <line x1="236" y1="305" x2="290" y2="305" stroke="#92400e" stroke-width="1" stroke-opacity="0.28"/>
+      <line x1="236" y1="314" x2="278" y2="314" stroke="#92400e" stroke-width="1" stroke-opacity="0.22"/>
+      <line x1="236" y1="323" x2="272" y2="323" stroke="#92400e" stroke-width="1" stroke-opacity="0.18"/>
+      <!-- Handwriting squiggles -->
+      <path d="M236,287 Q242,285 248,287 Q254,289 260,287 Q266,285 272,287 Q278,289 284,287 Q288,285 290,287"
+            fill="none" stroke="#78350f" stroke-width="1" stroke-opacity="0.50"/>
+      <path d="M236,296 Q241,294 247,296 Q253,298 259,296 Q265,294 271,296 Q277,298 283,296 Q288,294 290,296"
+            fill="none" stroke="#78350f" stroke-width="1" stroke-opacity="0.42"/>
+      <path d="M236,305 Q242,303 248,305 Q254,307 260,305 Q266,303 272,305 Q276,307 280,305"
+            fill="none" stroke="#78350f" stroke-width="1" stroke-opacity="0.36"/>
+      <path d="M236,314 Q241,312 247,314 Q253,316 259,314 Q264,312 270,314 Q274,316 278,314"
+            fill="none" stroke="#78350f" stroke-width="1" stroke-opacity="0.30"/>
+      <!-- Top-left hover highlight -->
+      <rect x="226" y="268" width="28" height="20" rx="4"
+            fill="white" fill-opacity="0.11"/>
+    </g>
+  </g>
+
+
+  <!-- ═══════════════════════════════════════════════════════════
+       CARD 3 — Bloque / Work  (active destination, right)
+       x=365, y=30   254 × 184
+       ═══════════════════════════════════════════════════════════ -->
+
+  <g filter="url(#f-card-active)">
+    <!-- Outer cyan halo -->
+    <rect x="356" y="22" width="272" height="200" rx="20"
+          fill="url(#grad-halo-work)"/>
+    <!-- Drop shadow -->
+    <rect x="370" y="36" width="254" height="184" rx="16"
+          fill="#000" fill-opacity="0.52"/>
+    <!-- Wallpaper + blob -->
+    <rect x="365" y="30" width="254" height="184" rx="16"
+          fill="url(#grad-wp-work)"/>
+    <rect x="365" y="30" width="254" height="184" rx="16"
+          fill="url(#grad-blob-work)" clip-path="url(#clip-card-work-h)"/>
+    <use href="#sym-menubar-h" transform="translate(365,30) scale(254,1.36)"/>
+
+    <g clip-path="url(#clip-card-work-h)" filter="url(#f-window-blur)">
+      <!-- Window A: IDE -->
+      <g transform="translate(373,50)">
+        <rect width="150" height="124" rx="7" fill="#031418" fill-opacity="0.94"/>
+        <rect width="150" height="16"  rx="7" fill="#093845" fill-opacity="0.98"/>
+        <rect y="8" width="150" height="8" fill="#093845" fill-opacity="0.98"/>
+        <use href="#sym-traffic-lights-h" transform="translate(8,4) scale(1.0)"/>
+        <rect x="32" y="3"  width="38" height="13" rx="3" fill="#0e5a6e" fill-opacity="0.70"/>
+        <rect x="74" y="3"  width="30" height="13" rx="3" fill="#063040" fill-opacity="0.50"/>
+        <!-- sidebar -->
+        <rect x="0" y="16" width="30" height="108" fill="#020c10" fill-opacity="0.85"/>
+        <rect x="6"  y="24" width="18" height="4.5" rx="1" fill="#0891b2" fill-opacity="0.65"/>
+        <rect x="6"  y="33" width="18" height="4.5" rx="1" fill="#0891b2" fill-opacity="0.45"/>
+        <rect x="6"  y="42" width="18" height="4.5" rx="1" fill="#22d3ee" fill-opacity="0.55"/>
+        <rect x="6"  y="51" width="18" height="4.5" rx="1" fill="#0891b2" fill-opacity="0.38"/>
+        <rect x="6"  y="60" width="18" height="4.5" rx="1" fill="#0891b2" fill-opacity="0.32"/>
+        <!-- code lines -->
+        <rect x="36" y="20" width="74" height="3.5" rx="1" fill="#22d3ee" fill-opacity="0.58"/>
+        <rect x="40" y="27" width="56" height="3.5" rx="1" fill="#67e8f9" fill-opacity="0.42"/>
+        <rect x="40" y="34" width="80" height="3.5" rx="1" fill="#a5f3fc" fill-opacity="0.32"/>
+        <rect x="36" y="41" width="40" height="3.5" rx="1" fill="#22d3ee" fill-opacity="0.52"/>
+        <rect x="40" y="48" width="66" height="3.5" rx="1" fill="#67e8f9" fill-opacity="0.38"/>
+        <rect x="40" y="55" width="50" height="3.5" rx="1" fill="#a5f3fc" fill-opacity="0.30"/>
+        <rect x="36" y="62" width="60" height="3.5" rx="1" fill="#22d3ee" fill-opacity="0.42"/>
+        <rect x="40" y="69" width="74" height="3.5" rx="1" fill="#67e8f9" fill-opacity="0.32"/>
+        <rect x="36" y="76" width="44" height="3.5" rx="1" fill="#0891b2" fill-opacity="0.50"/>
+        <rect x="36" y="83" width="70" height="3.5" rx="1" fill="#22d3ee" fill-opacity="0.36"/>
+        <rect x="36" y="90" width="54" height="3.5" rx="1" fill="#67e8f9" fill-opacity="0.28"/>
+        <!-- active line highlight -->
+        <rect x="30" y="60" width="112" height="6" rx="1" fill="#22d3ee" fill-opacity="0.06"/>
+      </g>
+      <!-- Window B: terminal -->
+      <g transform="translate(530,48)">
+        <rect width="82" height="66" rx="7" fill="#02080e" fill-opacity="0.96"/>
+        <rect width="82" height="15" rx="7" fill="#062030" fill-opacity="0.97"/>
+        <rect y="7" width="82" height="8" fill="#062030" fill-opacity="0.97"/>
+        <use href="#sym-traffic-lights-h" transform="translate(7,4) scale(0.95)"/>
+        <rect x="6" y="19" width="36" height="3" rx="1" fill="#22d3ee" fill-opacity="0.72"/>
+        <rect x="6" y="26" width="62" height="3" rx="1" fill="#0891b2" fill-opacity="0.52"/>
+        <rect x="6" y="33" width="46" height="3" rx="1" fill="#22d3ee" fill-opacity="0.58"/>
+        <rect x="6" y="40" width="68" height="3" rx="1" fill="#0891b2" fill-opacity="0.46"/>
+        <rect x="6" y="47" width="52" height="3" rx="1" fill="#22d3ee" fill-opacity="0.62"/>
+        <rect x="6" y="54" width="6"  height="6" rx="1" fill="#22d3ee" fill-opacity="0.88"/>
+      </g>
+      <!-- Window C: chart -->
+      <g transform="translate(530,124)">
+        <rect width="82" height="52" rx="7" fill="#020e16" fill-opacity="0.94"/>
+        <rect width="82" height="13" rx="7" fill="#072838" fill-opacity="0.97"/>
+        <rect y="6" width="82" height="7" fill="#072838" fill-opacity="0.97"/>
+        <use href="#sym-traffic-lights-h" transform="translate(7,3.5) scale(0.90)"/>
+        <rect x="6"  y="28" width="9" height="18" rx="1" fill="#0891b2" fill-opacity="0.52"/>
+        <rect x="18" y="22" width="9" height="24" rx="1" fill="#22d3ee" fill-opacity="0.68"/>
+        <rect x="30" y="24" width="9" height="22" rx="1" fill="#0891b2" fill-opacity="0.56"/>
+        <rect x="42" y="17" width="9" height="29" rx="1" fill="#22d3ee" fill-opacity="0.72"/>
+        <rect x="54" y="20" width="9" height="26" rx="1" fill="#0891b2" fill-opacity="0.62"/>
+        <rect x="66" y="26" width="9" height="20" rx="1" fill="#22d3ee" fill-opacity="0.50"/>
+        <line x1="2" y1="46" x2="80" y2="46"
+              stroke="#22d3ee" stroke-width="0.6" stroke-opacity="0.20"/>
+      </g>
+    </g>
+
+    <!-- Dock -->
+    <g transform="translate(365,30)" clip-path="url(#clip-card-work-h)">
+      <use href="#sym-dock-pill-h" transform="translate(72,172) scale(1.70,1)"/>
+      <rect x="79"  y="174" width="12" height="6" rx="2" fill="#06b6d4" fill-opacity="0.82"/>
+      <rect x="94"  y="174" width="12" height="6" rx="2" fill="#0891b2" fill-opacity="0.72"/>
+      <rect x="109" y="174" width="12" height="6" rx="2" fill="#22d3ee" fill-opacity="0.68"/>
+      <rect x="124" y="174" width="12" height="6" rx="2" fill="#0e7490" fill-opacity="0.72"/>
+      <rect x="139" y="174" width="12" height="6" rx="2" fill="#06b6d4" fill-opacity="0.62"/>
+      <rect x="154" y="174" width="12" height="6" rx="2" fill="#0891b2" fill-opacity="0.58"/>
+      <circle cx="85"  cy="182" r="1.4" fill="white" fill-opacity="0.52"/>
+      <circle cx="100" cy="182" r="1.4" fill="white" fill-opacity="0.52"/>
+      <circle cx="115" cy="182" r="1.4" fill="white" fill-opacity="0.52"/>
+    </g>
+
+    <rect x="365" y="30" width="254" height="35" rx="16"
+          fill="white" fill-opacity="0.05" clip-path="url(#clip-card-work-h)"/>
+    <rect x="365" y="30" width="254" height="184" rx="16"
+          fill="none" stroke="#22d3ee" stroke-width="1.4" stroke-opacity="0.72"/>
+    <!-- Active indicator dot -->
+    <circle cx="604" cy="45" r="6.5"  fill="#22d3ee" fill-opacity="0.92"/>
+    <circle cx="604" cy="45" r="12"   fill="#22d3ee" fill-opacity="0.14"/>
+  </g>
+
+
+  <!-- Vignette (left edge) -->
+  <rect width="1280" height="400" fill="url(#grad-vignette)"/>
+
+  <!-- ─── Divider ─────────────────────────────────────────────── -->
+  <rect x="666" y="0" width="1" height="400" fill="url(#grad-divider)"/>
+
+  <!-- ─── Text ──────────────────────────────────────────────────── -->
+
+  <text x="706" y="172"
         font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
-        font-size="58" font-weight="700" fill="white" letter-spacing="-1">
+        font-size="62" font-weight="700" fill="white" letter-spacing="-1.5">
     Context Switch
   </text>
 
-  <!-- Tagline -->
-  <text x="714" y="234"
+  <text x="708" y="226"
         font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
-        font-size="22" font-weight="400" fill="#C4B5FD" letter-spacing="0.2">
+        font-size="23" font-weight="400" fill="#c4b5fd" letter-spacing="0.3">
     git stash for your brain
   </text>
 
-  <!-- Platform badge -->
-  <text x="716" y="284"
+  <text x="710" y="274"
         font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
-        font-size="15" font-weight="500" fill="#6D28D9" letter-spacing="1.5">
+        font-size="13" font-weight="600" fill="#4c1d95" letter-spacing="2.5">
     RAYCAST EXTENSION
   </text>
+
 </svg>

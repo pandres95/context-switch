@@ -1,3 +1,5 @@
+![Context Switch](assets/readme-header.svg)
+
 # Context Switch
 
 A Raycast extension that orchestrates context switching with brain stashing — save what's on your mind before switching workspaces, pick it back up when you arrive.

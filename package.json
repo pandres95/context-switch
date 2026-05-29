@@ -2,7 +2,7 @@
   "name": "context-switch",
   "title": "Context Switch",
   "description": "Orchestrate context switching with brain stashing — save what's in your head before switching, pick it back up when you arrive.",
-  "icon": "extension-icon.png",
+  "icon": "extension-icon.svg",
   "author": "pandres95",
   "categories": ["Productivity"],
   "license": "MIT",

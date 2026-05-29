@@ -1,0 +1,70 @@
+{
+  "name": "context-switch",
+  "title": "Context Switch",
+  "description": "Orchestrate context switching with brain stashing — save what's in your head before switching, pick it back up when you arrive.",
+  "icon": "extension-icon.png",
+  "author": "pandres95",
+  "categories": ["Productivity"],
+  "license": "MIT",
+  "version": "2.0.0",
+  "commands": [
+    {
+      "name": "switch",
+      "title": "Switch Context",
+      "subtitle": "Context Switch",
+      "description": "Stash what's in your head and switch to another context",
+      "mode": "view",
+      "arguments": [
+        {
+          "name": "to",
+          "placeholder": "context-slug",
+          "type": "text",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "pop",
+      "title": "Pop",
+      "subtitle": "Context Switch",
+      "description": "Review stashed notes for the current context",
+      "mode": "view"
+    },
+    {
+      "name": "settings",
+      "title": "Settings",
+      "subtitle": "Context Switch",
+      "description": "Configure contexts and create Quicklinks",
+      "mode": "view"
+    }
+  ],
+  "preferences": [
+    {
+      "name": "configPath",
+      "title": "Config file",
+      "description": "Path to your context-switch config file. Leave empty to use the default (~/.config/context-switch/config.json).",
+      "type": "file",
+      "required": false
+    }
+  ],
+  "dependencies": {
+    "@raycast/api": "^1.79.0",
+    "better-sqlite3": "^12.10.0"
+  },
+  "devDependencies": {
+    "@raycast/eslint-config": "^1.0.11",
+    "@types/better-sqlite3": "^7.6.11",
+    "@types/node": "^20.8.10",
+    "@types/react": "^19.0.0",
+    "bun-types": "^1.3.14",
+    "eslint": "^8.57.0",
+    "typescript": "^5.4.5"
+  },
+  "scripts": {
+    "build": "ray build -e dist",
+    "dev": "ray develop",
+    "lint": "ray lint",
+    "fix-lint": "ray lint --fix",
+    "test": "bun test tests/"
+  }
+}

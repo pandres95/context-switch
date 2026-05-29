@@ -18,6 +18,8 @@ declare type Preferences = ExtensionPreferences
 declare namespace Preferences {
   /** Preferences accessible in the `switch` command */
   export type Switch = ExtensionPreferences & {}
+  /** Preferences accessible in the `dump` command */
+  export type Dump = ExtensionPreferences & {}
   /** Preferences accessible in the `pop` command */
   export type Pop = ExtensionPreferences & {}
   /** Preferences accessible in the `settings` command */
@@ -30,6 +32,8 @@ declare namespace Arguments {
   /** context-slug */
   "to": string
 }
+  /** Arguments passed to the `dump` command */
+  export type Dump = {}
   /** Arguments passed to the `pop` command */
   export type Pop = {}
   /** Arguments passed to the `settings` command */

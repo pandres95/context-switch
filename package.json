@@ -24,6 +24,13 @@
       ]
     },
     {
+      "name": "dump",
+      "title": "Dump Note",
+      "subtitle": "Context Switch",
+      "description": "Quick-dump a note to the current context without switching",
+      "mode": "view"
+    },
+    {
       "name": "pop",
       "title": "Pop",
       "subtitle": "Context Switch",

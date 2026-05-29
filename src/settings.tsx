@@ -10,10 +10,12 @@ import { getContexts } from "./config";
 import type { Context } from "./types";
 import pkg from "../package.json";
 
-function buildDeeplink(contextId: string): string {
+function buildSwitchDeeplink(contextId: string): string {
   const args = encodeURIComponent(JSON.stringify({ to: contextId }));
   return `raycast://extensions/${pkg.author}/${pkg.name}/switch?arguments=${args}`;
 }
+
+const dumpDeeplink = `raycast://extensions/${pkg.author}/${pkg.name}/dump`;
 
 export default function SettingsCommand() {
   const contexts = getContexts();
@@ -39,7 +41,7 @@ export default function SettingsCommand() {
         <>
           <List.Section title="Contexts — create a Quicklink for each">
             {contexts.map((ctx: Context) => {
-              const deeplink = buildDeeplink(ctx.id);
+              const deeplink = buildSwitchDeeplink(ctx.id);
               return (
                 <List.Item
                   key={ctx.id}
@@ -65,6 +67,22 @@ export default function SettingsCommand() {
                 />
               );
             })}
+          </List.Section>
+
+          <List.Section title="Dump — quick note in current context">
+            <List.Item
+              icon="📝"
+              title="Dump Note"
+              subtitle="No context switch — saves to current context"
+              accessories={[{ text: "⏎ to create Quicklink" }]}
+              actions={
+                <ActionPanel>
+                  <Action.CreateQuicklink
+                    quicklink={{ name: "Context Switch: Dump", link: dumpDeeplink }}
+                  />
+                </ActionPanel>
+              }
+            />
           </List.Section>
 
           <List.Section title="Next step — assign hotkeys">

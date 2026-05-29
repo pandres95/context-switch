@@ -1,0 +1,616 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 512 512"
+  width="512"
+  height="512"
+  role="img"
+>
+  <title>Context Switcher</title>
+  <desc>
+    Three macOS desktop thumbnails arranged diagonally on a near-black
+    background. A sticky note lands on the front origin card, one corner
+    just touching down, representing a memory deposited before switching
+    context.
+  </desc>
+
+  <!--
+    ═══════════════════════════════════════════════════════
+    LAYOUT CONSTANTS
+    Card dimensions
+      card-sm  (personal, back):   168 × 112  at translate(28,  145)
+      card-md  (uni, origin):      172 × 115  at translate(100, 250)
+      card-lg  (work, active):     204 × 148  at translate(288, 183)
+
+    Each card's internal coordinate system starts at (0,0) = card top-left.
+    Menubar  height: 11px  (sm/md) / 14px (lg)
+    Dock     height:  8px  at bottom of card interior
+    ═══════════════════════════════════════════════════════
+  -->
+
+  <defs>
+
+    <!-- ─── Filters ─────────────────────────────────────────── -->
+
+    <filter id="f-card-dim" x="-18%" y="-18%" width="136%" height="136%">
+      <feGaussianBlur stdDeviation="3.5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <filter id="f-card-active" x="-22%" y="-22%" width="144%" height="144%">
+      <feGaussianBlur stdDeviation="8" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <filter id="f-window-blur">
+      <feGaussianBlur stdDeviation="0.5"/>
+    </filter>
+
+    <filter id="f-note-shadow" x="-30%" y="-30%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="7" result="blur"/>
+      <feOffset dx="4" dy="6" result="shifted"/>
+      <feFlood flood-color="#000" flood-opacity="0.5" result="color"/>
+      <feComposite in="color" in2="shifted" operator="in" result="shadow"/>
+      <feMerge><feMergeNode in="shadow"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <filter id="f-note-glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="9" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+
+    <!-- ─── Gradients — background & wallpapers ─────────────── -->
+
+    <radialGradient id="grad-bg" cx="40%" cy="50%" r="72%">
+      <stop offset="0%"   stop-color="#0e0c1c"/>
+      <stop offset="100%" stop-color="#060509"/>
+    </radialGradient>
+
+    <linearGradient id="grad-wp-personal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#2d1b69"/>
+      <stop offset="100%" stop-color="#1a0d3d"/>
+    </linearGradient>
+
+    <linearGradient id="grad-wp-uni" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#0e2254"/>
+      <stop offset="100%" stop-color="#081530"/>
+    </linearGradient>
+
+    <linearGradient id="grad-wp-work" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#052330"/>
+      <stop offset="50%"  stop-color="#093845"/>
+      <stop offset="100%" stop-color="#031418"/>
+    </linearGradient>
+
+
+    <!-- ─── Gradients — ambient blobs (applied over wallpaper) ─ -->
+
+    <radialGradient id="grad-blob-personal" cx="60%" cy="65%" r="55%">
+      <stop offset="0%"   stop-color="#7c3aed" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#2d1b69" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="grad-blob-uni" cx="35%" cy="60%" r="55%">
+      <stop offset="0%"   stop-color="#2563eb" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#0e2254" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="grad-blob-work" cx="50%" cy="52%" r="62%">
+      <stop offset="0%"   stop-color="#0891b2" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#052330" stop-opacity="0"/>
+    </radialGradient>
+
+    <radialGradient id="grad-halo-work" cx="50%" cy="50%" r="58%">
+      <stop offset="0%"   stop-color="#22d3ee" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#22d3ee" stop-opacity="0"/>
+    </radialGradient>
+
+
+    <!-- ─── Gradients — sticky note ─────────────────────────── -->
+
+    <linearGradient id="grad-note-face" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#fef3c7"/>
+      <stop offset="100%" stop-color="#fbbf24"/>
+    </linearGradient>
+
+
+    <!-- ─── Vignette ─────────────────────────────────────────── -->
+
+    <radialGradient id="grad-vignette" cx="50%" cy="50%" r="66%">
+      <stop offset="50%"  stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0.65"/>
+    </radialGradient>
+
+
+    <!-- ─── Icon shape clip ──────────────────────────────────── -->
+
+    <clipPath id="clip-icon">
+      <rect width="512" height="512" rx="112"/>
+    </clipPath>
+
+
+    <!-- ─── Card clip paths (absolute coords, one per card) ─── -->
+    <!--
+      These reference the card's position in canvas space so that
+      wallpaper blobs and window content are clipped to the card bounds.
+      Named: clip-card-{name}
+    -->
+
+    <clipPath id="clip-card-personal">
+      <rect x="28"  y="145" width="168" height="112" rx="9"/>
+    </clipPath>
+
+    <clipPath id="clip-card-uni">
+      <rect x="100" y="250" width="172" height="115" rx="10"/>
+    </clipPath>
+
+    <clipPath id="clip-card-work">
+      <rect x="288" y="183" width="204" height="148" rx="13"/>
+    </clipPath>
+
+
+    <!-- ─── Reusable symbol: menubar (fits card width via transform) -->
+    <!--
+      Drawn at width=1 (normalised). Scale to card width via:
+        <use href="#sym-menubar" transform="scale(CARD_WIDTH, 1)"/>
+      Apple logo circle at x=0.07, menu items start at x=0.14.
+      Right-side status icons at x=0.96, 0.93, 0.90.
+    -->
+    <symbol id="sym-menubar" viewBox="0 0 1 11" preserveAspectRatio="none">
+      <rect width="1" height="11" fill="#000" fill-opacity="0.3"/>
+      <!-- apple logo placeholder dot -->
+      <circle cx="0.07" cy="5.5" r="0.018" fill="white" fill-opacity="0.5"/>
+      <!-- menu labels -->
+      <rect x="0.13" y="3" width="0.1"  height="4" rx="0.008" fill="white" fill-opacity="0.25"/>
+      <rect x="0.25" y="3" width="0.07" height="4" rx="0.008" fill="white" fill-opacity="0.2"/>
+      <rect x="0.34" y="3" width="0.08" height="4" rx="0.008" fill="white" fill-opacity="0.18"/>
+      <!-- right-side status icons -->
+      <rect x="0.94" y="3" width="0.04" height="4" rx="0.005" fill="white" fill-opacity="0.32"/>
+      <rect x="0.88" y="3" width="0.04" height="4" rx="0.005" fill="white" fill-opacity="0.32"/>
+      <rect x="0.82" y="3" width="0.04" height="4" rx="0.005" fill="white" fill-opacity="0.28"/>
+    </symbol>
+
+
+    <!-- ─── Reusable symbol: traffic lights (stoplight row) ──── -->
+    <!--
+      Three circles at y=0, spaced 6px apart. x=0 is leftmost circle.
+      Use at the start of each window's titlebar.
+    -->
+    <symbol id="sym-traffic-lights" viewBox="0 0 20 4">
+      <circle cx="2"  cy="2" r="1.8" fill="#ff5f57"/>
+      <circle cx="8"  cy="2" r="1.8" fill="#febc2e"/>
+      <circle cx="14" cy="2" r="1.8" fill="#28c840"/>
+    </symbol>
+
+
+    <!-- ─── Reusable symbol: dock pill ───────────────────────── -->
+    <!--
+      A translucent pill with coloured app icon slots.
+      Parameterised by colour via CSS currentColor — caller wraps in
+      a <g color="…"> to tint the slots.
+      viewBox width=100, height=10.
+      Slots at x=5,17,29,41,53,65 each 9×6.
+    -->
+    <symbol id="sym-dock-pill" viewBox="0 0 100 10">
+      <rect width="100" height="10" rx="5" fill="white" fill-opacity="0.1"/>
+    </symbol>
+
+  </defs>
+
+
+  <!-- ═══════════════════════════════════════════════════════════
+       SCENE ROOT — everything clipped to rounded-rect icon shape
+       ═══════════════════════════════════════════════════════════ -->
+
+  <g clip-path="url(#clip-icon)">
+
+    <!-- Background -->
+    <rect width="512" height="512" fill="url(#grad-bg)"/>
+
+    <!-- Ambient depth fog blobs -->
+    <ellipse cx="160" cy="320" rx="175" ry="140" fill="#1a0840" opacity="0.2"/>
+    <ellipse cx="390" cy="270" rx="165" ry="130" fill="#031e28"  opacity="0.2"/>
+
+
+    <!-- ───────────────────────────────────────────────────────
+         CARD 1 — Personal desktop  (back, top-left)
+         Canvas position: translate(28, 145)   size: 168 × 112
+         ─────────────────────────────────────────────────────── -->
+
+    <g id="card-personal" filter="url(#f-card-dim)" opacity="0.7">
+
+      <!-- Drop shadow -->
+      <rect x="31" y="150" width="168" height="112" rx="9"
+            fill="#000" fill-opacity="0.4"/>
+
+      <!-- Wallpaper + ambient blob -->
+      <rect x="28" y="145" width="168" height="112" rx="9"
+            fill="url(#grad-wp-personal)"/>
+      <rect x="28" y="145" width="168" height="112" rx="9"
+            fill="url(#grad-blob-personal)"
+            clip-path="url(#clip-card-personal)"/>
+
+      <!-- Menubar -->
+      <use href="#sym-menubar"
+           transform="translate(28,145) scale(168,1)"/>
+
+      <!-- Windows -->
+      <g clip-path="url(#clip-card-personal)" filter="url(#f-window-blur)">
+
+        <!-- Window A: messaging (left) -->
+        <g transform="translate(34, 161)">
+          <rect width="72" height="54" rx="5"
+                fill="#180a38" fill-opacity="0.9"/>
+          <!-- titlebar -->
+          <rect width="72" height="9" rx="5"
+                fill="#2d1b69" fill-opacity="0.95"/>
+          <rect y="4"  width="72" height="5"
+                fill="#2d1b69" fill-opacity="0.95"/>
+          <use href="#sym-traffic-lights"
+               transform="translate(5, 3) scale(0.7)"/>
+          <!-- chat bubbles -->
+          <rect x="5"  y="13" width="38" height="5" rx="2" fill="#7c3aed" fill-opacity="0.65"/>
+          <rect x="21" y="21" width="28" height="5" rx="2" fill="#4a1a6b" fill-opacity="0.75"/>
+          <rect x="5"  y="29" width="34" height="5" rx="2" fill="#7c3aed" fill-opacity="0.55"/>
+          <rect x="5"  y="37" width="42" height="5" rx="2" fill="#4a1a6b" fill-opacity="0.65"/>
+        </g>
+
+        <!-- Window B: photo grid (right) -->
+        <g transform="translate(114, 158)">
+          <rect width="72" height="52" rx="5"
+                fill="#1c0e3e" fill-opacity="0.92"/>
+          <rect width="72" height="9" rx="5"
+                fill="#3b1f7a" fill-opacity="0.95"/>
+          <rect y="4" width="72" height="5"
+                fill="#3b1f7a" fill-opacity="0.95"/>
+          <use href="#sym-traffic-lights"
+               transform="translate(5, 3) scale(0.7)"/>
+          <!-- 2×2 photo grid -->
+          <rect x="4"  y="13" width="26" height="17" rx="2" fill="#6d28d9" fill-opacity="0.5"/>
+          <rect x="33" y="13" width="26" height="17" rx="2" fill="#8b5cf6" fill-opacity="0.42"/>
+          <rect x="4"  y="33" width="26" height="16" rx="2" fill="#9333ea" fill-opacity="0.38"/>
+          <rect x="33" y="33" width="26" height="16" rx="2" fill="#7c3aed" fill-opacity="0.45"/>
+        </g>
+
+      </g>
+
+      <!-- Dock — personal palette (violet / pink) -->
+      <g transform="translate(28, 145)" clip-path="url(#clip-card-personal)">
+        <use href="#sym-dock-pill"
+             transform="translate(32,102) scale(1.04,1)"/>
+        <rect x="37"  y="104" width="7" height="4" rx="2" fill="#a855f7" fill-opacity="0.7"/>
+        <rect x="47"  y="104" width="7" height="4" rx="2" fill="#ec4899" fill-opacity="0.6"/>
+        <rect x="57"  y="104" width="7" height="4" rx="2" fill="#8b5cf6" fill-opacity="0.6"/>
+        <rect x="67"  y="104" width="7" height="4" rx="2" fill="#f472b6" fill-opacity="0.5"/>
+        <rect x="77"  y="104" width="7" height="4" rx="2" fill="#a78bfa" fill-opacity="0.5"/>
+        <!-- running app indicator -->
+        <circle cx="40" cy="110" r="1" fill="white" fill-opacity="0.4"/>
+      </g>
+
+      <!-- Glass sheen (top edge) -->
+      <rect x="28" y="145" width="168" height="20" rx="9"
+            fill="white" fill-opacity="0.04"
+            clip-path="url(#clip-card-personal)"/>
+
+      <!-- Card border -->
+      <rect x="28" y="145" width="168" height="112" rx="9"
+            fill="none" stroke="#9d5cf6"
+            stroke-width="0.6" stroke-opacity="0.45"/>
+
+    </g><!-- /card-personal -->
+
+
+    <!-- ───────────────────────────────────────────────────────
+         CARD 2 — University desktop  (front origin, mid)
+         Canvas position: translate(100, 250)  size: 172 × 115
+         ─────────────────────────────────────────────────────── -->
+
+    <g id="card-uni" filter="url(#f-card-dim)" opacity="0.9">
+
+      <!-- Drop shadow -->
+      <rect x="103" y="255" width="172" height="115" rx="10"
+            fill="#000" fill-opacity="0.45"/>
+
+      <!-- Wallpaper + blob -->
+      <rect x="100" y="250" width="172" height="115" rx="10"
+            fill="url(#grad-wp-uni)"/>
+      <rect x="100" y="250" width="172" height="115" rx="10"
+            fill="url(#grad-blob-uni)"
+            clip-path="url(#clip-card-uni)"/>
+
+      <!-- Menubar -->
+      <use href="#sym-menubar"
+           transform="translate(100,250) scale(172,1)"/>
+
+      <!-- Windows -->
+      <g clip-path="url(#clip-card-uni)" filter="url(#f-window-blur)">
+
+        <!-- Window A: PDF / document reader -->
+        <g transform="translate(106, 267)">
+          <rect width="88" height="65" rx="5"
+                fill="#0b1c3c" fill-opacity="0.92"/>
+          <rect width="88" height="10" rx="5"
+                fill="#18357a" fill-opacity="0.95"/>
+          <rect y="5" width="88" height="5"
+                fill="#18357a" fill-opacity="0.95"/>
+          <use href="#sym-traffic-lights"
+               transform="translate(6, 3) scale(0.75)"/>
+          <!-- document text lines -->
+          <rect x="6" y="15" width="74" height="3" rx="1" fill="#4a7cc7" fill-opacity="0.58"/>
+          <rect x="6" y="21" width="68" height="3" rx="1" fill="#4a7cc7" fill-opacity="0.44"/>
+          <rect x="6" y="27" width="74" height="3" rx="1" fill="#4a7cc7" fill-opacity="0.5"/>
+          <rect x="6" y="33" width="52" height="3" rx="1" fill="#4a7cc7" fill-opacity="0.38"/>
+          <rect x="6" y="39" width="70" height="3" rx="1" fill="#4a7cc7" fill-opacity="0.44"/>
+          <rect x="6" y="45" width="60" height="3" rx="1" fill="#4a7cc7" fill-opacity="0.38"/>
+          <rect x="6" y="51" width="76" height="3" rx="1" fill="#4a7cc7" fill-opacity="0.34"/>
+        </g>
+
+        <!-- Window B: browser / research -->
+        <g transform="translate(202, 265)">
+          <rect width="62" height="62" rx="5"
+                fill="#0c1d42" fill-opacity="0.92"/>
+          <rect width="62" height="10" rx="5"
+                fill="#1f3d82" fill-opacity="0.95"/>
+          <rect y="5" width="62" height="5"
+                fill="#1f3d82" fill-opacity="0.95"/>
+          <use href="#sym-traffic-lights"
+               transform="translate(5, 3) scale(0.7)"/>
+          <!-- URL bar -->
+          <rect x="4" y="14" width="52" height="4" rx="2" fill="#1a3a72" fill-opacity="0.7"/>
+          <!-- page content blocks -->
+          <rect x="4" y="21" width="52" height="9"  rx="2" fill="#2d5a9e" fill-opacity="0.42"/>
+          <rect x="4" y="33" width="36" height="3"  rx="1" fill="#3b5fc0" fill-opacity="0.48"/>
+          <rect x="4" y="39" width="50" height="3"  rx="1" fill="#3b5fc0" fill-opacity="0.34"/>
+          <rect x="4" y="45" width="44" height="3"  rx="1" fill="#3b5fc0" fill-opacity="0.34"/>
+          <rect x="4" y="51" width="28" height="7"  rx="2" fill="#2563eb" fill-opacity="0.48"/>
+        </g>
+
+      </g>
+
+      <!-- Dock — university palette (blue / indigo) -->
+      <g transform="translate(100,250)" clip-path="url(#clip-card-uni)">
+        <use href="#sym-dock-pill"
+             transform="translate(42,105) scale(1.04,1)"/>
+        <rect x="47"  y="107" width="7" height="4" rx="2" fill="#3b82f6" fill-opacity="0.7"/>
+        <rect x="57"  y="107" width="7" height="4" rx="2" fill="#60a5fa" fill-opacity="0.6"/>
+        <rect x="67"  y="107" width="7" height="4" rx="2" fill="#2563eb" fill-opacity="0.6"/>
+        <rect x="77"  y="107" width="7" height="4" rx="2" fill="#4f46e5" fill-opacity="0.6"/>
+        <rect x="87"  y="107" width="7" height="4" rx="2" fill="#7c3aed" fill-opacity="0.5"/>
+        <rect x="97"  y="107" width="7" height="4" rx="2" fill="#1d4ed8" fill-opacity="0.5"/>
+        <circle cx="50" cy="113" r="1" fill="white" fill-opacity="0.4"/>
+        <circle cx="60" cy="113" r="1" fill="white" fill-opacity="0.4"/>
+      </g>
+
+      <!-- Glass sheen -->
+      <rect x="100" y="250" width="172" height="22" rx="10"
+            fill="white" fill-opacity="0.045"
+            clip-path="url(#clip-card-uni)"/>
+
+      <!-- Card border -->
+      <rect x="100" y="250" width="172" height="115" rx="10"
+            fill="none" stroke="#5080cc"
+            stroke-width="0.65" stroke-opacity="0.5"/>
+
+    </g><!-- /card-uni -->
+
+
+    <!-- ───────────────────────────────────────────────────────
+         STICKY NOTE — deposited on card-uni's front-right edge
+         
+         Note rect (pre-rotation): x=182, y=303, w=58, h=54
+         Landing corner (bottom-right, stays on card): (240, 357)
+         Rotation: -9° around pivot (240, 357)
+         Top-left corner (hovering, farthest from card surface):
+           gets brightest highlight, least shadow.
+         ─────────────────────────────────────────────────────── -->
+
+    <g id="sticky-note">
+
+      <!-- Ambient amber glow behind note -->
+      <rect x="178" y="299" width="66" height="62" rx="4"
+            fill="#fbbf24" fill-opacity="0.4"
+            filter="url(#f-note-glow)"
+            transform="rotate(-9, 240, 357)"/>
+
+      <!-- Ground shadow — ellipse heaviest at landing corner -->
+      <ellipse cx="228" cy="360" rx="28" ry="6"
+               fill="#000" fill-opacity="0.36"
+               filter="url(#f-note-shadow)"/>
+
+      <!-- Note body + content -->
+      <g filter="url(#f-note-shadow)"
+         transform="rotate(-9, 240, 357)">
+
+        <!-- Face -->
+        <rect x="182" y="303" width="58" height="54" rx="3"
+              fill="url(#grad-note-face)"/>
+
+        <!-- Adhesive strip (top band, slightly darker) -->
+        <rect x="182" y="303" width="58" height="8" rx="3"
+              fill="#fbbf24" fill-opacity="0.6"/>
+        <rect x="182" y="307" width="58" height="4"
+              fill="#fbbf24" fill-opacity="0.4"/>
+
+        <!-- Ruled lines -->
+        <line x1="190" y1="319" x2="232" y2="319"
+              stroke="#92400e" stroke-width="0.85" stroke-opacity="0.40"/>
+        <line x1="190" y1="326" x2="232" y2="326"
+              stroke="#92400e" stroke-width="0.85" stroke-opacity="0.35"/>
+        <line x1="190" y1="333" x2="232" y2="333"
+              stroke="#92400e" stroke-width="0.85" stroke-opacity="0.30"/>
+        <line x1="190" y1="340" x2="224" y2="340"
+              stroke="#92400e" stroke-width="0.85" stroke-opacity="0.25"/>
+        <line x1="190" y1="347" x2="218" y2="347"
+              stroke="#92400e" stroke-width="0.85" stroke-opacity="0.20"/>
+
+        <!-- Handwriting squiggles -->
+        <path d="M190,319 Q196,317 201,319 Q207,321 213,319 Q218,317 224,319 Q229,321 232,319"
+              fill="none" stroke="#78350f" stroke-width="0.85" stroke-opacity="0.52"/>
+        <path d="M190,326 Q195,324 200,326 Q206,328 212,326 Q218,324 224,326 Q229,328 232,326"
+              fill="none" stroke="#78350f" stroke-width="0.85" stroke-opacity="0.44"/>
+        <path d="M190,333 Q196,331 202,333 Q208,335 214,333 Q219,331 224,333"
+              fill="none" stroke="#78350f" stroke-width="0.85" stroke-opacity="0.38"/>
+        <path d="M190,340 Q195,338 200,340 Q206,342 212,340 Q217,338 222,340"
+              fill="none" stroke="#78350f" stroke-width="0.85" stroke-opacity="0.32"/>
+
+        <!-- Top-left highlight — hovering corner catches most light -->
+        <rect x="182" y="303" width="22" height="16" rx="3"
+              fill="white" fill-opacity="0.12"/>
+
+      </g>
+    </g><!-- /sticky-note -->
+
+
+    <!-- ───────────────────────────────────────────────────────
+         CARD 3 — Work desktop  (active destination, right)
+         Canvas position: translate(288, 183)  size: 204 × 148
+         ─────────────────────────────────────────────────────── -->
+
+    <g id="card-work" filter="url(#f-card-active)">
+
+      <!-- Outer cyan halo -->
+      <rect x="280" y="175" width="222" height="164" rx="17"
+            fill="url(#grad-halo-work)"/>
+
+      <!-- Drop shadow -->
+      <rect x="293" y="189" width="204" height="148" rx="13"
+            fill="#000" fill-opacity="0.55"/>
+
+      <!-- Wallpaper + blob -->
+      <rect x="288" y="183" width="204" height="148" rx="13"
+            fill="url(#grad-wp-work)"/>
+      <rect x="288" y="183" width="204" height="148" rx="13"
+            fill="url(#grad-blob-work)"
+            clip-path="url(#clip-card-work)"/>
+
+      <!-- Menubar -->
+      <use href="#sym-menubar"
+           transform="translate(288,183) scale(204,1.27)"/>
+
+      <!-- Windows -->
+      <g clip-path="url(#clip-card-work)" filter="url(#f-window-blur)">
+
+        <!-- Window A: IDE (large, left) -->
+        <g transform="translate(294, 202)">
+          <rect width="120" height="100" rx="6"
+                fill="#031418" fill-opacity="0.94"/>
+          <!-- titlebar -->
+          <rect width="120" height="13" rx="6"
+                fill="#093845" fill-opacity="0.98"/>
+          <rect y="7" width="120" height="6"
+                fill="#093845" fill-opacity="0.98"/>
+          <use href="#sym-traffic-lights"
+               transform="translate(7, 3) scale(0.85)"/>
+          <!-- tabs -->
+          <rect x="26" y="2"  width="30" height="11" rx="3" fill="#0e5a6e" fill-opacity="0.7"/>
+          <rect x="59" y="2"  width="24" height="11" rx="3" fill="#063040" fill-opacity="0.5"/>
+          <!-- sidebar -->
+          <rect x="0"  y="13" width="24" height="87" fill="#020c10" fill-opacity="0.85"/>
+          <rect x="5"  y="19" width="14" height="3.5" rx="1" fill="#0891b2" fill-opacity="0.65"/>
+          <rect x="5"  y="26" width="14" height="3.5" rx="1" fill="#0891b2" fill-opacity="0.45"/>
+          <rect x="5"  y="33" width="14" height="3.5" rx="1" fill="#22d3ee" fill-opacity="0.55"/>
+          <rect x="5"  y="40" width="14" height="3.5" rx="1" fill="#0891b2" fill-opacity="0.38"/>
+          <rect x="5"  y="47" width="14" height="3.5" rx="1" fill="#0891b2" fill-opacity="0.32"/>
+          <!-- code lines -->
+          <rect x="28" y="16" width="60" height="2.8" rx="1" fill="#22d3ee" fill-opacity="0.58"/>
+          <rect x="32" y="22" width="46" height="2.8" rx="1" fill="#67e8f9" fill-opacity="0.42"/>
+          <rect x="32" y="28" width="64" height="2.8" rx="1" fill="#a5f3fc" fill-opacity="0.32"/>
+          <rect x="28" y="34" width="32" height="2.8" rx="1" fill="#22d3ee" fill-opacity="0.52"/>
+          <rect x="32" y="40" width="54" height="2.8" rx="1" fill="#67e8f9" fill-opacity="0.38"/>
+          <rect x="32" y="46" width="40" height="2.8" rx="1" fill="#a5f3fc" fill-opacity="0.30"/>
+          <rect x="28" y="52" width="50" height="2.8" rx="1" fill="#22d3ee" fill-opacity="0.42"/>
+          <rect x="32" y="58" width="60" height="2.8" rx="1" fill="#67e8f9" fill-opacity="0.32"/>
+          <rect x="28" y="64" width="36" height="2.8" rx="1" fill="#0891b2" fill-opacity="0.52"/>
+          <rect x="28" y="70" width="56" height="2.8" rx="1" fill="#22d3ee" fill-opacity="0.38"/>
+          <rect x="28" y="76" width="44" height="2.8" rx="1" fill="#67e8f9" fill-opacity="0.30"/>
+          <rect x="28" y="82" width="62" height="2.8" rx="1" fill="#a5f3fc" fill-opacity="0.28"/>
+          <!-- active line highlight -->
+          <rect x="24" y="49" width="90" height="5" rx="1" fill="#22d3ee" fill-opacity="0.065"/>
+        </g>
+
+        <!-- Window B: terminal (top-right) -->
+        <g transform="translate(420, 200)">
+          <rect width="66" height="54" rx="6"
+                fill="#02080e" fill-opacity="0.96"/>
+          <rect width="66" height="12" rx="6"
+                fill="#062030" fill-opacity="0.97"/>
+          <rect y="6" width="66" height="6"
+                fill="#062030" fill-opacity="0.97"/>
+          <use href="#sym-traffic-lights"
+               transform="translate(6, 3) scale(0.8)"/>
+          <!-- terminal text lines -->
+          <rect x="5" y="16" width="30" height="2.5" rx="1" fill="#22d3ee" fill-opacity="0.72"/>
+          <rect x="5" y="22" width="50" height="2.5" rx="1" fill="#0891b2" fill-opacity="0.52"/>
+          <rect x="5" y="28" width="38" height="2.5" rx="1" fill="#22d3ee" fill-opacity="0.58"/>
+          <rect x="5" y="34" width="54" height="2.5" rx="1" fill="#0891b2" fill-opacity="0.46"/>
+          <rect x="5" y="40" width="42" height="2.5" rx="1" fill="#22d3ee" fill-opacity="0.62"/>
+          <!-- cursor block -->
+          <rect x="5" y="46" width="5"  height="5"   rx="1" fill="#22d3ee" fill-opacity="0.88"/>
+        </g>
+
+        <!-- Window C: chart panel (bottom-right) -->
+        <g transform="translate(420, 261)">
+          <rect width="66" height="42" rx="6"
+                fill="#020e16" fill-opacity="0.94"/>
+          <rect width="66" height="11" rx="6"
+                fill="#072838" fill-opacity="0.97"/>
+          <rect y="5" width="66" height="6"
+                fill="#072838" fill-opacity="0.97"/>
+          <use href="#sym-traffic-lights"
+               transform="translate(6, 2.5) scale(0.75)"/>
+          <!-- bar chart -->
+          <rect x="5"  y="24" width="7" height="14" rx="1" fill="#0891b2" fill-opacity="0.52"/>
+          <rect x="15" y="19" width="7" height="19" rx="1" fill="#22d3ee" fill-opacity="0.68"/>
+          <rect x="25" y="21" width="7" height="17" rx="1" fill="#0891b2" fill-opacity="0.57"/>
+          <rect x="35" y="14" width="7" height="24" rx="1" fill="#22d3ee" fill-opacity="0.72"/>
+          <rect x="45" y="17" width="7" height="21" rx="1" fill="#0891b2" fill-opacity="0.62"/>
+          <rect x="55" y="22" width="7" height="16" rx="1" fill="#22d3ee" fill-opacity="0.50"/>
+          <!-- baseline -->
+          <line x1="2" y1="37" x2="64" y2="37"
+                stroke="#22d3ee" stroke-width="0.5" stroke-opacity="0.2"/>
+        </g>
+
+      </g>
+
+      <!-- Dock — work palette (cyan / teal) -->
+      <g transform="translate(288,183)" clip-path="url(#clip-card-work)">
+        <use href="#sym-dock-pill"
+             transform="translate(58,136) scale(1.36,1)"/>
+        <rect x="64"  y="138" width="10" height="5" rx="2" fill="#06b6d4" fill-opacity="0.82"/>
+        <rect x="77"  y="138" width="10" height="5" rx="2" fill="#0891b2" fill-opacity="0.72"/>
+        <rect x="90"  y="138" width="10" height="5" rx="2" fill="#22d3ee" fill-opacity="0.68"/>
+        <rect x="103" y="138" width="10" height="5" rx="2" fill="#0e7490" fill-opacity="0.72"/>
+        <rect x="116" y="138" width="10" height="5" rx="2" fill="#06b6d4" fill-opacity="0.62"/>
+        <rect x="129" y="138" width="10" height="5" rx="2" fill="#0891b2" fill-opacity="0.58"/>
+        <rect x="142" y="138" width="10" height="5" rx="2" fill="#22d3ee" fill-opacity="0.52"/>
+        <!-- running app indicators -->
+        <circle cx="69"  cy="145" r="1.2" fill="white" fill-opacity="0.52"/>
+        <circle cx="82"  cy="145" r="1.2" fill="white" fill-opacity="0.52"/>
+        <circle cx="95"  cy="145" r="1.2" fill="white" fill-opacity="0.52"/>
+      </g>
+
+      <!-- Glass sheen -->
+      <rect x="288" y="183" width="204" height="28" rx="13"
+            fill="white" fill-opacity="0.055"
+            clip-path="url(#clip-card-work)"/>
+
+      <!-- Active card border -->
+      <rect x="288" y="183" width="204" height="148" rx="13"
+            fill="none" stroke="#22d3ee"
+            stroke-width="1.2" stroke-opacity="0.72"/>
+
+      <!-- Active indicator dot (top-right corner of card) -->
+      <circle cx="477" cy="196" r="5.5"
+              fill="#22d3ee" fill-opacity="0.92"/>
+      <circle cx="477" cy="196" r="10"
+              fill="#22d3ee" fill-opacity="0.14"/>
+
+    </g><!-- /card-work -->
+
+
+    <!-- Vignette (rendered last, over everything) -->
+    <rect width="512" height="512" fill="url(#grad-vignette)"/>
+
+  </g><!-- /clip-icon -->
+
+</svg>
